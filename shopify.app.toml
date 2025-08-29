@@ -3,7 +3,7 @@
 client_id = "1694f4a344450ac8b1e3178aa3fa3a29"
 name = "Shop Reels"
 handle = "shop-reels-1"
-application_url = "https://six-sally-mf-pn.trycloudflare.com"
+application_url = "https://main.d2nq6i8yu7phkz.amplifyapp.com"
 embedded = true
 
 [build]
@@ -31,7 +31,11 @@ api_version = "2025-07"
 scopes = "write_metaobjects,read_metaobjects,write_products,read_products,write_files,read_files,write_metaobject_definitions"
 
 [auth]
-redirect_urls = ["https://six-sally-mf-pn.trycloudflare.com/auth/callback", "https://six-sally-mf-pn.trycloudflare.com/auth/shopify/callback", "https://six-sally-mf-pn.trycloudflare.com/api/auth/callback"]
+redirect_urls = [
+  "https://main.d2nq6i8yu7phkz.amplifyapp.com/auth/callback",
+  "https://main.d2nq6i8yu7phkz.amplifyapp.com/auth/shopify/callback",
+  "https://main.d2nq6i8yu7phkz.amplifyapp.com/api/auth/callback"
+]
 
 [pos]
 embedded = false
