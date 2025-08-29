@@ -1,0 +1,507 @@
+<div id="shoppable-video-dialog" class="sv-dialog hidden" role="dialog" aria-modal="true">
+  <!-- Overlay -->
+  <div class="sv-dialog-overlay" onclick="closeShoppableVideoDialog()">
+
+  <!-- Dialog Content -->
+  <div class="sv-dialog-container" onclick="event.stopPropagation()">
+    <!-- Close Button -->
+    <button class="sv-dialog-close" onclick="closeShoppableVideoDialog()">✕</button>
+
+    <div class="sv-dialog-body">
+      <!-- Video Container -->
+      <div class="sv-dialog-video-wrapper">
+        <video
+          id="sv-dialog-video"
+          class="sv-dialog-video"
+          playsinline
+          controls
+          muted
+          preload="metadata"
+        ></video>
+      </div>
+
+      <!-- Single Product Details -->
+      <div class="sv-dialog-product">
+        <div class="sv-product-top">
+          <img id="sv-product-image" src="" alt="Product" />
+        </div>
+        <div class="sv-product-mid">
+          <h4 id="sv-product-title"></h4>
+          <div class="sv-price-wrap">
+            <span id="sv-product-price" class="sv-product-price"></span>
+            <span id="sv-product-compare" class="sv-product-compare"></span>
+            <span id="sv-product-discount" class="sv-product-discount"></span>
+          </div>
+
+          <!-- Variant Selector -->
+          <div id="sv-variant-selector" class="sv-variant-selector hidden">
+            <label for="sv-variant-dropdown">Choose an option:</label>
+            <select id="sv-variant-dropdown"></select>
+          </div>
+
+          
+          <a id="sv-product-link" class="sv-product-link">View Product →</a>
+        </div>
+        <div class="sv-product-footer">
+          <button id="sv-add-cart" class="sv-btn sv-btn-secondary">Add to Cart</button>
+          <button id="sv-buy-now" class="sv-btn sv-btn-primary">Buy Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<style>
+.sv-variant-selector {
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .sv-variant-selector label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+  }
+  .sv-variant-selector select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+
+  /* Overlay */
+  .sv-dialog-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px);
+    z-index: 9998;
+  }
+
+  /* Dialog Container */
+  .sv-dialog-container {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 980px;
+    height: 90vh;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 14px 48px rgba(0,0,0,0.18);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    animation: sv-fadein 0.3s ease forwards;
+    z-index: 9999;
+  }
+  @keyframes sv-fadein {
+    from { opacity: 0; transform: translate(-50%, -48%) scale(0.94); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+
+  /* Close Button */
+  .sv-dialog-close {
+    position: absolute; top: 16px; right: 16px;
+    background: #fff; border-radius: 50%;
+    width: 38px; height: 38px;
+    border: none; font-size: 18px; color: #444;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: background 0.25s;
+    z-index: 10000;
+  }
+  .sv-dialog-close:hover { background: #f7f7f7; }
+
+  /* Body flex */
+  .sv-dialog-body {
+    flex: 1; display: flex;
+  }
+
+  /* Video */
+  .sv-dialog-video-wrapper {
+    flex: 1; position: relative;
+    border-radius: 16px 0 0 16px;
+    background: #000;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sv-dialog-video {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+
+  .sv-dialog-video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;     /* fills the screen, no black bars */
+  object-position: center;
+  display: block;        /* remove default inline spacing */
+  background: #000;      /* safe fallback for loading state */
+}
+
+  /* Product Panel */
+  .sv-dialog-product {
+    flex: 1; display: flex; flex-direction: column;
+    background: #fafafa; box-shadow: inset 1px 0 0 #eee;
+    position: relative;
+  }
+
+  .sv-product-top img {
+    width: 100%; object-fit: contain;
+    max-height: 360px;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+    object-position: top;  
+  }
+
+  .sv-product-mid {
+    flex: 1; padding: 16px;
+    overflow-y: auto;
+  }
+
+  .sv-product-mid h4 {
+    margin: 0 0 8px; font-size: 18px; font-weight: 600; color: #222;
+  }
+
+  .sv-price-wrap { display: flex; gap: 8px; align-items: center; }
+  .sv-product-price { font-size: 16px; font-weight: 600; color: #008060; }
+  .sv-product-compare { text-decoration: line-through; color: #999; font-size: 14px; }
+  .sv-product-discount { font-size: 14px; color: #e91e63; font-weight: 500; }
+
+  .sv-product-desc {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;   /* show only 4 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .sv-product-link { display: inline-block; margin-top: 10px; font-size: 14px; font-weight: 600; text-decoration: none; }
+  .sv-product-link:hover { text-decoration: none; }
+
+  /* Footer */
+  .sv-product-footer {
+    display: flex; gap: 12px;
+    padding: 14px 16px;
+    border-top: 1px solid #eee;
+    background: #fff;
+    padding-bottom: 30px;
+  }
+  .sv-btn {
+    flex: 1; padding: 12px;
+    font-size: 14px; font-weight: 600;
+    border-radius: 8px; border: none;
+    cursor: pointer; transition: opacity 0.25s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .sv-btn:hover { opacity: 0.9; }
+  .sv-btn-primary { background: #e91e63; color: #fff; }
+  .sv-btn-secondary { background: #008060; color: #fff; }
+
+/* Mobile - Full Screen Video with Overlaid Product Strip */
+@media (max-width: 720px) {
+  .sv-dialog-container { 
+    width: 100%; 
+    height: 100vh; 
+    border-radius: 0; 
+    max-width: none;
+    transform: translate(-50%, -50%);
+  }
+  
+  .sv-dialog-body { 
+    position: relative;
+    height: 100%;
+  }
+  
+  /* Video takes full screen */
+  .sv-dialog-video-wrapper { 
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 0; 
+  }
+  
+.sv-dialog-video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;     /* fills the screen, no black bars */
+  object-position: center;
+  display: block;        /* remove default inline spacing */
+  background: #000;      /* safe fallback for loading state */
+}
+
+ .sv-dialog-product { 
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.2);
+  border-top: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: row;
+  z-index: 10001;
+  height: auto;          /* instead of fixed min-height */
+  max-height: 40%;       /* keeps it compact on small screens */
+}
+
+  /* Image */
+  .sv-product-top {
+    width: 100px;
+    height: 130px;
+    margin: 16px 12px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f9f9f9;
+    border: 1px solid #eee;
+  }
+  .sv-product-top img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: top;
+  }
+
+  /* Info */
+ .sv-product-mid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 6px;
+  padding-bottom: 50px;  
+  margin-bottom: 10px;
+}
+
+  .sv-product-mid h4 {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: #222;
+  }
+
+  .sv-price-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 2px 0 6px;
+    align-items: baseline;
+  }
+
+  .sv-product-price { font-size: 18px; font-weight: 700; color: #008060; }
+  .sv-product-compare { font-size: 14px; color: #999; text-decoration: line-through; }
+  .sv-product-discount { font-size: 13px; color: #e91e63; font-weight: 600; }
+
+  /* Variant Selector */
+  .sv-variant-selector {
+    margin-top: 4px;
+  }
+  .sv-variant-selector label {
+    font-size: 13px;
+    margin-bottom: 4px;
+    color: #555;
+  }
+  .sv-variant-selector select {
+    padding: 8px 10px;
+    font-size: 14px;
+    border-radius: 6px;
+  }
+
+  /* Hide desc & link */
+  .sv-product-desc, .sv-product-link { display: none; }
+
+  /* Footer buttons */
+  .sv-product-footer {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 12px 14px 16px; /* Adjust padding for better visual balance */
+    gap: 10px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    background: #fff;
+    display: flex;
+    z-index: 10002;
+  }
+  .sv-btn {
+    flex: 1;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 8px;
+  }
+
+  /* Mobile close btn */
+  .sv-dialog-close {
+    top: 12px; right: 12px;
+    background: rgba(0,0,0,0.65);
+    color: #fff;
+    width: 38px; height: 38px;
+    font-size: 16px;
+  }
+}
+
+
+  .hidden { display: none !important; }
+</style>
+
+<script>
+   function pauseAllTrayReels() {
+    document.querySelectorAll('.sv-reels-row video').forEach(v => v.pause());
+  }
+
+  function playAllTrayReels() {
+    document.querySelectorAll('.sv-reels-row video').forEach(v => {
+      v.play().catch(() => {}); // in case autoplay restrictions
+    });
+  }
+
+  function pauseFloatingReel() {
+    const floatingReel = document.getElementById('sv-floating-reel');
+      if (floatingReel) {
+        floatingReel.style.display = 'none';
+        const reelVideo = floatingReel.querySelector('video');
+        if (reelVideo) reelVideo.pause();
+      }
+  }
+  function playFloatingReel() {
+  const floatingReel = document.getElementById('sv-floating-reel');
+      if (floatingReel) {
+        floatingReel.style.display = 'block';
+        const reelVideo = floatingReel.querySelector('video');
+        if (reelVideo) reelVideo.play();
+      }
+  }
+
+
+  function openShoppableVideoDialog(videoHtml, product, addToCartColor, shopNowColor) {
+    const dialog = document.getElementById('shoppable-video-dialog');
+    const wrapper = dialog.querySelector('.sv-dialog-video-wrapper');
+
+    pauseAllTrayReels();
+    pauseFloatingReel();
+
+    wrapper.innerHTML = videoHtml;
+    const videoEl = wrapper.querySelector('video');
+    videoEl.setAttribute('controls', true);
+    videoEl.play().catch(() => videoEl.setAttribute('controls', true));
+
+    // Fill product details
+    document.getElementById('sv-product-image').src = product.image;
+    document.getElementById('sv-product-title').innerText = product.title;
+   // document.getElementById('sv-product-desc').innerHTML = product.description;
+    document.getElementById('sv-product-link').href = product.url;
+
+     const addCartBtn = document.getElementById('sv-add-cart');
+  const buyNowBtn = document.getElementById('sv-buy-now');
+
+  if (addToCartColor) {
+    addCartBtn.style.backgroundColor = addToCartColor;
+    addCartBtn.style.color = "#fff"; // force white text
+  }
+  if (shopNowColor) {
+    buyNowBtn.style.backgroundColor = shopNowColor;
+    buyNowBtn.style.color = "#fff";
+  }
+
+    if (!product.variants || product.variants.length === 0) {
+  updatePriceUI(product.price, product.compareAtPrice);
+}
+
+// Handle variants
+const variantSelector = document.getElementById('sv-variant-selector');
+const variantDropdown = document.getElementById('sv-variant-dropdown');
+
+if (product.variants && product.variants.length > 1) {
+  // Show dropdown if multiple variants
+  variantSelector.classList.remove('hidden');
+  variantDropdown.innerHTML = "";
+
+  product.variants.forEach((v, index) => {
+    const option = document.createElement("option");
+    option.value = v.id;
+    option.text = `${v.title} - ${v.price}`;
+    option.disabled = !v.available;
+    if (index === 0 && v.available) {
+      option.selected = true;
+      updateVariantUI(v);
+    }
+    variantDropdown.appendChild(option);
+  });
+
+  variantDropdown.onchange = () => {
+    const selected = product.variants.find(v => v.id == variantDropdown.value);
+    if (selected) updateVariantUI(selected);
+  };
+
+} else if (product.variants && product.variants.length === 1) {
+  // Only one variant → auto-select and hide dropdown
+  variantSelector.classList.add('hidden');
+  const singleVariant = product.variants[0];
+  currentVariantId = singleVariant.id;
+  updateVariantUI(singleVariant);
+
+} else {
+  // No variants
+  variantSelector.classList.add('hidden');
+  currentVariantId = product.variantId;
+  updatePriceUI(product.price, product.compareAtPrice);
+}
+
+    // Button actions
+    document.getElementById('sv-add-cart').onclick = () => addToCart(currentVariantId);
+    document.getElementById('sv-buy-now').onclick = () => buyNow(currentVariantId);
+
+    dialog.classList.remove('hidden');
+  }
+
+  function updateVariantUI(variant) {
+    currentVariantId = variant.id;
+    updatePriceUI(variant.price, variant.compareAtPrice);
+  }
+
+  function updatePriceUI(price, compareAtPrice) {
+  const priceEl = document.getElementById('sv-product-price');
+  const compareEl = document.getElementById('sv-product-compare');
+
+  priceEl.innerText = price || "";
+
+  if (compareAtPrice && compareAtPrice !== "$0.00") {
+    compareEl.innerText = compareAtPrice;
+    compareEl.style.display = "inline";
+  } else {
+    compareEl.style.display = "none";
+  }
+}
+
+
+  async function addToCart(variantId) {
+    if (!variantId) return alert("Please select a variant.");
+    await fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: variantId, quantity: 1 })
+    });
+    window.location.href = '/cart';
+  }
+
+  async function buyNow(variantId) {
+    if (!variantId) return alert("Please select a variant.");
+    await fetch('/cart/clear.js', { method: 'POST' });
+    await fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: variantId, quantity: 1 })
+    });
+    window.location.href = '/checkout';
+  }
+
+  function closeShoppableVideoDialog() {
+    const dialog = document.getElementById('shoppable-video-dialog');
+    const videoEl = dialog.querySelector('video');
+    if (videoEl) videoEl.pause();
+    dialog.classList.add('hidden');
+    playFloatingReel();
+    playAllTrayReels();
+  }
+</script>

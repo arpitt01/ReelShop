@@ -1,0 +1,37 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "1694f4a344450ac8b1e3178aa3fa3a29"
+name = "Shop Reels"
+handle = "shop-reels-1"
+application_url = "https://six-sally-mf-pn.trycloudflare.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-07"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/app/scopes_update"
+
+  [[webhooks.subscriptions]]
+  compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
+  uri = "https://kaeyowa0hg.execute-api.ap-south-1.amazonaws.com"
+
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "write_metaobjects,read_metaobjects,write_products,read_products,write_files,read_files,write_metaobject_definitions"
+
+[auth]
+redirect_urls = ["https://six-sally-mf-pn.trycloudflare.com/auth/callback", "https://six-sally-mf-pn.trycloudflare.com/auth/shopify/callback", "https://six-sally-mf-pn.trycloudflare.com/api/auth/callback"]
+
+[pos]
+embedded = false

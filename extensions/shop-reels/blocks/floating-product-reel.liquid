@@ -1,0 +1,122 @@
+<div id="sv-floating-reel" class="sv-floating-reel" role="region" aria-label="Shoppable Reel">
+  <button class="sv-floating-close" onclick="document.getElementById('sv-floating-reel').style.display='none'">✕</button>
+
+  {%- assign reels = shop.metaobjects.shop-reels.values -%}
+  {%- assign matching_reel = nil -%}
+
+  {%- for reel in reels -%}
+    {%- assign product_field = reel.product.value -%}
+    {%- if product_field and product_field.id == product.id -%}
+      {%- assign matching_reel = reel -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if matching_reel and matching_reel.video.value -%}
+    <div class="sv-reel-content" 
+      onclick="openShoppableVideoDialog('{{ matching_reel.video.value | video_tag: autoplay: true, loop: true, muted: false, playsinline: true | escape }}', 
+        {% if matching_reel.product.value %}
+          {
+            id: '{{ matching_reel.product.value.id }}',
+            handle: '{{ matching_reel.product.value.handle }}',
+            image: '{{ matching_reel.product.value.featured_image | img_url: '400x' }}',
+            title: '{{ matching_reel.product.value.title | escape }}',
+            price: '{{ matching_reel.product.value.price | money }}',
+            compareAtPrice: '{{ matching_reel.product.value.compare_at_price | money }}',
+            vendor: '{{ matching_reel.product.value.vendor | escape }}',
+            description: `{{ matching_reel.product.value.description |  escape }}`,
+            url: '{{ matching_reel.product.value.url }}',
+            variants: [
+              {% for v in matching_reel.product.value.variants %}
+                {
+                  id: '{{ v.id }}',
+                  title: '{{ v.title | escape }}',
+                  price: '{{ v.price | money }}',
+                  compareAtPrice: '{{ v.compare_at_price | money }}',
+                  available: {{ v.available | json }},
+                  sku: '{{ v.sku | escape }}'
+                }{% unless forloop.last %},{% endunless %}
+              {% endfor %}
+            ]
+          }
+        {% endif %},'{{ block.settings.add_to_cart_color }}','{{ block.settings.shop_now_color }}'
+      )">
+      {{ matching_reel.video.value | video_tag: autoplay: true, loop: true, muted: true, playsinline: true }}
+    </div>
+  {%- endif -%}
+</div>
+
+<!-- Include reusable dialog -->
+{% render 'shoppable-video-dialog' %}
+
+<style>
+  .sv-floating-reel {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    width: 200px;
+    max-width: 40vw;
+    background: transparent;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    z-index: 9999;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .sv-floating-close {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 22px;
+    text-align: center;
+    z-index: 10000;
+  }
+
+  .sv-reel-content video {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    display: block;
+  }
+
+  /* Mobile optimization */
+  @media (max-width: 768px) {
+    .sv-floating-reel {
+      width: 140px;
+      max-width: 35vw;
+      bottom: 12px;
+      right: 12px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Floating Product Reel",
+  "target": "section",
+  "templates": ["product"],
+  "settings": [
+   {
+      "type": "color",
+      "id": "add_to_cart_color",
+      "label": "Add to Cart Button Color",
+      "default": "#e91e63"
+    },
+    {
+      "type": "color",
+      "id": "shop_now_color",
+      "label": "Shop Now Button Color",
+      "default": "#008060"
+    }
+  ]
+}
+{% endschema %}
